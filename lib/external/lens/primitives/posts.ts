@@ -1,0 +1,142 @@
+import { client } from "@/lib/external/lens/protocol-client";
+import { APP_ADDRESS } from "@/lib/shared/constants";
+import { Address } from "@/types/common";
+import type {
+  AnyPost,
+  Post as LensPost,
+  Post,
+  PostId,
+  PostsRequest,
+  PublicClient,
+  SessionClient,
+} from "@lens-protocol/client";
+import { PageSize, PostReferenceType, PostType, evmAddress } from "@lens-protocol/client";
+import { fetchPost, fetchPostReferences, fetchPosts } from "@lens-protocol/client/actions";
+
+export interface PaginatedPostsResult {
+  posts: LensPost[];
+  pageInfo: any;
+}
+
+/**
+ * Fetch a single post from Lens Protocol, allowing custom client (sessionClient)
+ */
+export async function fetchPostWithClient(postId: string, lensClient: SessionClient | PublicClient): Promise<AnyPost> {
+  const result = await fetchPost(lensClient, { post: postId });
+  if (result.isErr()) {
+    throw new Error(`Failed to fetch post: ${result.error.message}`);
+  }
+  return result.value as AnyPost;
+}
+
+/**
+ * Batch fetch multiple posts from Lens Protocol
+ */
+export async function fetchPostsBatch(postIds: string[], sessionClient?: SessionClient): Promise<Post[]> {
+  if (!postIds.length) return [];
+  const lensClient = sessionClient ?? client;
+  const result = await fetchPosts(lensClient, { filter: { posts: postIds } });
+  if (!result.isOk() || !result.value.items) return [];
+
+  return (result.value.items as Post[]).filter(post => post && post.__typename === "Post" && postIds.includes(post.id));
+}
+
+/**
+ * Fetch posts for a thread with cursor-based pagination
+ */
+export async function fetchPostsByFeed(
+  threadAddress: string,
+  sessionClient?: SessionClient,
+  options?: { sort?: "asc" | "desc"; limit?: number; cursor?: string },
+): Promise<PaginatedPostsResult> {
+  const params: PostsRequest = {
+    filter: {
+      feeds: [{ feed: evmAddress(threadAddress) }],
+      postTypes: [PostType.Root],
+    },
+    pageSize: PageSize.Ten,
+    cursor: options?.cursor,
+  };
+
+  const lensClient = sessionClient ?? client;
+  const result = await fetchPosts(lensClient, params);
+
+  if (!result.isOk() || !result.value.items) {
+    return { posts: [], pageInfo: { prev: null, next: null } };
+  }
+
+  const posts = result.value.items as LensPost[];
+
+  const validPosts = posts.filter(
+    (item: any) => item && item.__typename === "Post" && item.author && item.author.address,
+  ) as LensPost[];
+
+  const sortOrder = options?.sort ?? "asc";
+  const sortedPosts = validPosts.toSorted((a, b) => {
+    const aTime = a.timestamp ? new Date(a.timestamp).getTime() : 0;
+    const bTime = b.timestamp ? new Date(b.timestamp).getTime() : 0;
+    return sortOrder === "desc" ? bTime - aTime : aTime - bTime;
+  });
+
+  return {
+    posts: sortedPosts,
+    pageInfo: {
+      next: result.value.pageInfo?.next ?? null,
+      prev: result.value.pageInfo?.prev ?? null,
+    },
+  };
+}
+
+/**
+ * Fetch all posts for a thread (non-paginated)
+ */
+export async function fetchCommentsByPostId(postId: PostId, sessionClient?: SessionClient): Promise<LensPost[]> {
+  const lensClient = sessionClient ?? client;
+  const result = await fetchPostReferences(lensClient, {
+    referencedPost: postId,
+    referenceTypes: [PostReferenceType.CommentOn],
+    // relevancyFilter: ReferenceRelevancyFilter.Relevant,
+  });
+
+  if (!result.isOk() || !result.value.items) return [];
+
+  const validPosts = result.value.items.filter(
+    (item: any) => item && item.__typename === "Post" && item.author && item.author.address,
+  ) as LensPost[];
+
+  // Sort by timestamp (oldest first)
+  validPosts.sort((a, b) => {
+    const aTime = a.timestamp ? new Date(a.timestamp).getTime() : 0;
+    const bTime = b.timestamp ? new Date(b.timestamp).getTime() : 0;
+    return aTime - bTime;
+  });
+
+  return validPosts;
+}
+
+/**
+ * Fetch latest posts by author
+ */
+export async function fetchPostsByAuthor(author: Address, limit: number = 10): Promise<LensPost[]> {
+  const result = await fetchPosts(client, {
+    filter: {
+      authors: [evmAddress(author)],
+      apps: [evmAddress(APP_ADDRESS)],
+    },
+  });
+
+  if (!result.isOk() || !result.value.items) return [];
+
+  const validPosts = result.value.items.filter(
+    (item: any) => item && item.__typename === "Post" && item.author && item.author.address,
+  ) as LensPost[];
+
+  // Sort by timestamp (newest first)
+  validPosts.sort((a, b) => {
+    const aTime = a.timestamp ? new Date(a.timestamp).getTime() : 0;
+    const bTime = b.timestamp ? new Date(b.timestamp).getTime() : 0;
+    return bTime - aTime;
+  });
+
+  return validPosts.slice(0, limit);
+}

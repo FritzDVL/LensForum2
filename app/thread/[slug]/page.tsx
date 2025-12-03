@@ -1,0 +1,100 @@
+import { ProtectedRoute } from "@/components/pages/protected-route";
+import { Thread } from "@/components/thread/thread";
+import { getThreadTitleAndSummary } from "@/lib/domain/threads/content";
+import { getCommunity } from "@/lib/services/community/get-community";
+import { getThread, getThreadBySlug } from "@/lib/services/thread/get-thread";
+import { Address } from "@/types/common";
+
+const MAX_TITLE_LENGTH = 70;
+const MAX_DESCRIPTION_LENGTH = 160;
+
+export async function generateMetadata({ params }: { params: { slug: string } }) {
+  const thread = await getThreadBySlug(params.slug);
+  if (thread.error || !thread.thread) {
+    return {
+      title: "Thread on LensForum",
+      description: "Join the discussion!",
+      openGraph: {
+        title: "Thread on LensForum",
+        description: "Join the discussion!",
+        images: ["/logo.png"],
+      },
+      twitter: {
+        card: "summary",
+        title: "Thread on LensForum",
+        description: "Join the discussion!",
+        images: ["/logo.png"],
+      },
+    };
+  }
+  const rootPost = thread.thread.rootPost;
+
+  const t = getThreadTitleAndSummary(rootPost);
+  let title = t.title || "Thread on LensForum";
+  let description = t.summary || "Join the discussion!";
+
+  // Truncate title and description for social sharing
+  if (title.length > MAX_TITLE_LENGTH) {
+    title = title.slice(0, MAX_TITLE_LENGTH - 1) + "…";
+  }
+  if (description.length > MAX_DESCRIPTION_LENGTH) {
+    description = description.slice(0, MAX_DESCRIPTION_LENGTH - 1) + "…";
+  }
+  const image = "/logo.png";
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      images: [image],
+    },
+    twitter: {
+      card: "summary",
+      title,
+      description,
+      images: [image],
+    },
+  };
+}
+
+// Server Component
+export default async function ThreadPage({ params }: { params: { slug: string } }) {
+  const slug = params.slug as Address;
+
+  // Try fetching by slug first (new threads)
+  let threadResult = await getThreadBySlug(slug);
+
+  // Fallback to fetching by rootPostId/feedAddress (old threads for retrocompatibility)
+  if (!threadResult.success || !threadResult.thread) {
+    threadResult = await getThread(slug);
+  }
+
+  // Handle errors
+  if (threadResult.error || !threadResult.thread) {
+    return (
+      <div className="flex h-32 items-center justify-center">
+        <p className="text-center text-sm text-red-500">{threadResult.error || "Thread not found"}</p>
+      </div>
+    );
+  }
+
+  const thread = threadResult.thread;
+
+  // Fetch community
+  const community = await getCommunity(thread.community);
+  if (community?.error || !community?.community) {
+    return (
+      <div className="flex h-32 items-center justify-center">
+        <p className="text-center text-sm text-red-500">{community?.error || "Community not found"}</p>
+      </div>
+    );
+  }
+
+  return (
+    <ProtectedRoute>
+      <Thread thread={thread} community={community.community} />
+    </ProtectedRoute>
+  );
+}
