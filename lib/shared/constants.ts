@@ -2,19 +2,19 @@ import { Env, getCurrentEnv } from "@/lib/env";
 import { Address } from "@/types/common";
 
 // Mainnet addresses
-const MAINNET_APP_ADDRESS: Address = "0x30BB11c7A400cE65Fc13f345AA4c5FFC1C333603";
+const MAINNET_APP_ADDRESS: Address = "0x637E685eF29403831dE51A58Bc8230b88549745E";
 const MAINNET_BASE_FEED_ADDRESS: Address = "0x3BF4Eb9725232130F5dA804cD16bBdb61171cf28";
-const MAINNET_ADMIN_USER_ADDRESS: Address = "0xaa4C60b784E2b3E485035399bF1b1aBDeD66A60f"; //LensForum
+const MAINNET_ADMIN_USER_ADDRESS: Address = "0x8aE18FfF977aCc6Dc690C288a61004a7c7D5A931"; //UpdatedWeb3Forum
 const MAINNET_LENS_CONTRACT_GROUP_MANAGER_ADDRESS: Address = "0xe12543e5f917adA5aeF92B26Bc08E1925ec9F53F";
 
 // Testnet addresses
-const TESTNET_APP_ADDRESS: Address = "0x9eD1562A4e3803964F3c84301b18d4E1944D340b";
-const TESTNET_BASE_FEED_ADDRESS: Address = "0x039dB35DC617b083ade172BCA13B9571672CEe71";
-const TESTNET_ADMIN_USER_ADDRESS: Address = "0xaa4C60b784E2b3E485035399bF1b1aBDeD66A60f";
-const TESTNET_LENS_CONTRACT_GROUP_MANAGER_ADDRESS: Address = "0xd12E1aD028d550F85F2a8d9130C46dB77A6A0a41";
+const TESTNET_APP_ADDRESS: Address = "0x23c579e074AFf0419F9b7Fca8CC12525dA7C8d29";
+const TESTNET_BASE_FEED_ADDRESS: Address = "0xAC1e58dfe673Bd258ee2065F874841ef749ef28C";
+const TESTNET_ADMIN_USER_ADDRESS: Address = "0xc93947ed78d87bdeb232d9c29c07fd0e8cf0a43e";
+const TESTNET_LENS_CONTRACT_GROUP_MANAGER_ADDRESS: Address = "0xC93947eD78d87bdeB232D9c29C07Fd0E8cf0A43E";
 
 // URLs
-const MAINNET_APP_URL = "https://lensforum.xyz";
+const MAINNET_APP_URL = "https://societyprotocol.xyz";
 const TESTNET_APP_URL = "http://localhost:3000";
 
 const env = getCurrentEnv();
@@ -34,7 +34,7 @@ export const HEY_URL = "https://hey.xyz/";
 export const GROVE_API_URL = "https://api.grove.storage/";
 // Usage: import { APP_ADDRESS, BASE_FEED_ADDRESS, ADMIN_USER_ADDRESS } from '@/lib/constants';
 
-export const APP_NAME = isTestnet ? "LensForumV1" : "LensForum";
+export const APP_NAME = isTestnet ? "Web3 Forum Test" : "Web3 Forum";
 
 // Paginations
 export const COMMUNITIES_PER_PAGE = 10;
