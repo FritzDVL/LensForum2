@@ -13,7 +13,7 @@ export function FeaturedCommunities({ featuredCommunities }: FeaturedCommunities
     <div className="w-full max-w-none overflow-hidden rounded-3xl border border-gray-200 bg-white shadow-sm backdrop-blur-sm dark:border-gray-700 dark:bg-gray-800">
       <div className="border-b border-slate-200/80 bg-gradient-to-r from-slate-100/90 to-white px-4 py-4 dark:border-gray-700/50 dark:from-gray-800/50 dark:to-gray-800 sm:px-6">
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-          <h3 className="truncate text-xl font-semibold text-slate-900 dark:text-gray-100">Featured Communities</h3>
+          <h3 className="truncate text-xl font-semibold text-slate-900 dark:text-gray-100">Featured Channels</h3>
           <Link
             href="/communities"
             className="flex shrink-0 items-center gap-1 text-sm font-medium text-brand-600 hover:text-brand-700"

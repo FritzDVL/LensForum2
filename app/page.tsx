@@ -1,39 +1,38 @@
-import { FeaturedCommunities } from "@/components/home/featured-communities";
+import { CommunitiesList } from "@/components/communities/list/communities-list";
 import { HeroSection } from "@/components/home/hero-section";
-import { StatsBar } from "@/components/home/stats-bar";
 import { ThreadsSwitcher } from "@/components/home/threads-switcher";
-import { getFeaturedCommunities } from "@/lib/services/community/get-featured-communities";
-import { getForumStatistics } from "@/lib/services/stats/get-forum-statistics";
+import { getCommunitiesPaginated } from "@/lib/services/community/get-communities-paginated";
 import { getFeaturedThreads } from "@/lib/services/thread/get-featured-threads";
 import { getLatestThreads } from "@/lib/services/thread/get-latest-threads";
+import { COMMUNITIES_PER_PAGE } from "@/lib/shared/constants";
 
 export default async function HomePage() {
-  const forumStatsResult = await getForumStatistics();
-  const forumStats = forumStatsResult.success && forumStatsResult.stats ? forumStatsResult.stats : null;
-  const statsError = !forumStatsResult.success;
-
   const latestThreadsResult = await getLatestThreads(5);
   const latestThreads = latestThreadsResult.success ? (latestThreadsResult.threads ?? []) : [];
 
   const featuredThreadsResult = await getFeaturedThreads(5);
   const featuredThreads = featuredThreadsResult.success ? (featuredThreadsResult.threads ?? []) : [];
 
-  const featuredCommunitiesResult = await getFeaturedCommunities();
-  const featuredCommunities = featuredCommunitiesResult.success ? (featuredCommunitiesResult.communities ?? []) : [];
+  // Fetch initial paginated communities (channels) for the main list
+  const communitiesResult = await getCommunitiesPaginated({
+    sort: { by: "memberCount", order: "desc" },
+    limit: COMMUNITIES_PER_PAGE,
+  });
+  const initialCommunities = communitiesResult.success ? (communitiesResult.communities ?? []) : [];
 
   return (
     <>
       <HeroSection />
-      <div className="mx-auto w-full max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
-        <StatsBar loadingStats={false} statsError={statsError} forumStats={forumStats ?? undefined} />
-        <div className="w-full">
-          <div className="flex flex-col lg:flex-row">
-            <div className="w-full gap-8 lg:w-2/3 lg:pr-4">
-              <ThreadsSwitcher featuredThreads={featuredThreads} latestThreads={latestThreads} />
-            </div>
-            <div className="w-full gap-8 lg:w-1/3 lg:pl-4">
-              <FeaturedCommunities featuredCommunities={featuredCommunities} />
-            </div>
+      <div className="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+        <div className="flex flex-col gap-8">
+          {/* All Channels Section (Main Feature) */}
+          <div className="w-full">
+            <CommunitiesList initialCommunities={initialCommunities} />
+          </div>
+
+          {/* Threads Section */}
+          <div className="w-full">
+            <ThreadsSwitcher featuredThreads={featuredThreads} latestThreads={latestThreads} />
           </div>
         </div>
       </div>

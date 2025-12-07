@@ -75,11 +75,11 @@ export function CommunitiesList({ initialCommunities }: CommunitiesListProps) {
           <div className="flex items-center justify-between">
             <h2 className="flex items-center text-2xl font-bold text-foreground">
               <Users className="mr-3 h-6 w-6 text-brand-500" />
-              All Communities
+              All Channels
             </h2>
           </div>
           <p className="mt-2 text-sm text-slate-600 dark:text-gray-400">
-            Discover and join communities to share ideas, collaborate, and connect with others who share your interests.
+            Discover and join channels to share ideas, collaborate, and connect with others who share your interests.
           </p>
           {/* Search Bar */}
           {/* <div className="mt-6">

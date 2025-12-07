@@ -22,7 +22,7 @@ export function HeroSection() {
       </div>
 
       <h1 className="mb-6 text-5xl font-bold tracking-tight text-gray-900 dark:text-gray-100 md:text-6xl">
-        Lens
+        Web3
         <span className="bg-gradient-to-r from-brand-600 to-brand-700 bg-clip-text text-transparent dark:from-brand-400 dark:to-brand-500">
           Forum
         </span>
@@ -36,7 +36,7 @@ export function HeroSection() {
         <Link href="/communities">
           <Button variant="default" className="rounded-full px-8 py-4 text-lg font-bold shadow-lg">
             <Compass className="mr-2 h-5 w-5" />
-            Explore Communities
+            Explore Channels
           </Button>
         </Link>
       </div>

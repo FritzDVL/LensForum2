@@ -50,7 +50,7 @@ export function NavbarMobile() {
             />
           </div>
           <span className="bg-gradient-to-r from-brand-600 to-brand-700 bg-clip-text text-xl font-bold text-transparent transition-all duration-300 group-hover:from-brand-500 group-hover:to-brand-600 group-hover:drop-shadow-sm dark:from-brand-400 dark:to-brand-500">
-            LensForum
+            Web3 Forum
           </span>
         </Link>
         <div className="flex items-center space-x-2">
@@ -112,7 +112,7 @@ export function NavbarMobile() {
                   }`}
                 >
                   <Users className="mr-2 h-4 w-4" />
-                  Communities
+                  Channels
                 </Button>
               </Link>
             </div>
