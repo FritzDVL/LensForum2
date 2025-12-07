@@ -22,6 +22,8 @@ export function useThreadCreateForm({ community, author }: UseThreadCreateFormPr
     content: "",
     tags: "",
     author: author,
+    categoryId: "",
+    tagIds: [],
   });
   const [isCreating, setIsCreating] = useState(false);
 
@@ -75,6 +77,12 @@ export function useThreadCreateForm({ community, author }: UseThreadCreateFormPr
       formDataToSubmit.append("author", formDataToUse.author);
       if (formDataToUse.tags) {
         formDataToSubmit.append("tags", formDataToUse.tags);
+      }
+      if (formDataToUse.categoryId) {
+        formDataToSubmit.append("categoryId", formDataToUse.categoryId);
+      }
+      if (formDataToUse.tagIds && formDataToUse.tagIds.length > 0) {
+        formDataToSubmit.append("tagIds", formDataToUse.tagIds.join(","));
       }
 
       await createThreadService(

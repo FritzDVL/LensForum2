@@ -34,7 +34,7 @@ const DEFAULT_POSTING_GUIDELINES: Rule[] = [
 export function RulesGuidelines({ title, rules, className = "", variant = "community" }: RulesGuidelinesProps) {
   // Determine default rules and title based on variant
   const defaultRules = variant === "posting" ? DEFAULT_POSTING_GUIDELINES : DEFAULT_COMMUNITY_RULES;
-  const defaultTitle = variant === "posting" ? "Guidelines" : "Community Rules";
+  const defaultTitle = variant === "posting" ? "Guidelines" : "Channel Rules";
 
   // Normalize rules to Rule[] format
   const normalizedRules: Rule[] = (rules || defaultRules).map(rule =>

@@ -20,6 +20,8 @@ export interface CreateThreadFormData {
   title: string;
   summary: string;
   content: string;
-  tags?: string;
+  tags?: string; // Legacy string tags for Lens metadata
   author: Address;
+  categoryId?: string;
+  tagIds?: string[]; // IDs for Supabase tags
 }

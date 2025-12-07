@@ -26,6 +26,8 @@ export async function persistCommunityThread(
   author: Address,
   rootPostId: string,
   slug: string,
+  categoryId?: string,
+  tagIds?: string[],
 ): Promise<CommunityThreadSupabase> {
   const supabase = await supabaseClient();
 
@@ -68,6 +70,33 @@ export async function persistCommunityThread(
     throw new Error(`Failed to create thread: ${error.message}`);
   }
 
+  // Insert Category Classification
+  if (categoryId) {
+    const { error: categoryError } = await supabase.from("thread_categories").insert({
+      publication_id: rootPostId,
+      category_id: categoryId,
+    });
+
+    if (categoryError) {
+      console.error("Failed to link category:", categoryError);
+      // We don't throw here to ensure thread creation succeeds even if classification fails
+    }
+  }
+
+  // Insert Tag Classifications
+  if (tagIds && tagIds.length > 0) {
+    const tagInserts = tagIds.map(tagId => ({
+      publication_id: rootPostId,
+      tag_id: tagId,
+    }));
+
+    const { error: tagError } = await supabase.from("thread_tags").insert(tagInserts);
+
+    if (tagError) {
+      console.error("Failed to link tags:", tagError);
+    }
+  }
+
   return newThread;
 }
 
@@ -80,8 +109,48 @@ export async function fetchCommunityThreads(
   communityId: string,
   limit?: number,
   offset?: number,
+  filters?: { categorySlug?: string; tagSlug?: string },
 ): Promise<CommunityThreadSupabase[]> {
   const supabase = await supabaseClient();
+
+  let rootPostIds: string[] | null = null;
+
+  // 1. Filter by Category
+  if (filters?.categorySlug) {
+    const { data: category } = await supabase.from("categories").select("id").eq("slug", filters.categorySlug).single();
+
+    if (category) {
+      const { data: threadCategories } = await supabase
+        .from("thread_categories")
+        .select("publication_id")
+        .eq("category_id", category.id);
+
+      const ids = threadCategories?.map(tc => tc.publication_id) || [];
+      rootPostIds = ids;
+    } else {
+      return []; // Category not found, return empty
+    }
+  }
+
+  // 2. Filter by Tag
+  if (filters?.tagSlug) {
+    const { data: tag } = await supabase.from("tags").select("id").eq("slug", filters.tagSlug).single();
+
+    if (tag) {
+      const { data: threadTags } = await supabase.from("thread_tags").select("publication_id").eq("tag_id", tag.id);
+
+      const ids = threadTags?.map(tt => tt.publication_id) || [];
+
+      if (rootPostIds !== null) {
+        // Intersection if both filters exist
+        rootPostIds = rootPostIds.filter(id => ids.includes(id));
+      } else {
+        rootPostIds = ids;
+      }
+    } else {
+      return []; // Tag not found
+    }
+  }
 
   let query = supabase
     .from("community_threads")
@@ -89,6 +158,12 @@ export async function fetchCommunityThreads(
     .eq("community_id", communityId)
     .eq("visible", true)
     .order("created_at", { ascending: false });
+
+  // Apply ID filter if we have one
+  if (rootPostIds !== null) {
+    if (rootPostIds.length === 0) return [];
+    query = query.in("root_post_id", rootPostIds);
+  }
 
   if (typeof limit === "number" && typeof offset === "number") {
     query = query.range(offset, offset + limit - 1);

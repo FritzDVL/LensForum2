@@ -5,42 +5,29 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { TagsInput } from "@/components/ui/tags-input";
-import { useTagsInput } from "@/hooks/forms/use-tags-input";
 import { useThreadCreateForm } from "@/hooks/forms/use-thread-create-form";
+import { Category, Tag } from "@/lib/domain/classification/types";
 import { Community } from "@/lib/domain/communities/types";
 import { useAuthStore } from "@/stores/auth-store";
 import { Send } from "lucide-react";
 
 interface ThreadCreateFormProps {
   community: Community;
+  categories: Category[];
+  tags: Tag[];
 }
 
-export function ThreadCreateForm({ community }: ThreadCreateFormProps) {
+export function ThreadCreateForm({ community, categories, tags }: ThreadCreateFormProps) {
   const { account } = useAuthStore();
   const { formData, setFormData, handleChange, handleSubmit, isCreating } = useThreadCreateForm({
     community,
     author: account?.address || "",
   });
-  const { tags, tagInput, setTagInput, addTag, removeTag, handleTagInputKeyDown } = useTagsInput();
-
-  const suggestedTags = [
-    "discussion",
-    "help",
-    "development",
-    "question",
-    "announcement",
-    "tutorial",
-    "feedback",
-    "showcase",
-    "governance",
-    "research",
-  ];
 
   const handleFormSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    const newFormData = { ...formData, tags: tags.join(",") };
+    const newFormData = { ...formData };
     setFormData(newFormData);
     handleSubmit(e, newFormData);
   };
@@ -88,21 +75,67 @@ export function ThreadCreateForm({ community }: ThreadCreateFormProps) {
               <TextEditor onChange={value => handleChange("content", value)} />
             </div>
           </div>
-          {/* Tags Input */}
+
+          {/* Category Selector */}
           <div className="space-y-2">
-            <Label htmlFor="tags" className="text-sm font-medium text-foreground">
-              Tags (optional) {tags.length > 0 && <span className="text-slate-500">({tags.length}/5)</span>}
+            <Label htmlFor="category" className="text-sm font-medium text-foreground">
+              Category
             </Label>
-            <TagsInput
-              tags={tags}
-              tagInput={tagInput}
-              setTagInput={setTagInput}
-              addTag={addTag}
-              removeTag={removeTag}
-              handleTagInputKeyDown={handleTagInputKeyDown}
-              suggestedTags={suggestedTags}
-              maxTags={5}
-            />
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+              {categories.map(category => (
+                <div
+                  key={category.id}
+                  onClick={() => handleChange("categoryId", category.id)}
+                  className={`cursor-pointer rounded-xl border p-3 transition-all ${
+                    formData.categoryId === category.id
+                      ? "border-brand-500 bg-brand-50 dark:border-brand-400 dark:bg-brand-900/20"
+                      : "border-slate-200 hover:border-brand-300 hover:bg-slate-50 dark:border-gray-700 dark:hover:bg-gray-800"
+                  }`}
+                >
+                  <div className="flex items-center gap-2">
+                    <div className="h-3 w-3 rounded-full" style={{ backgroundColor: category.color }} />
+                    <span className="font-medium text-foreground">{category.name}</span>
+                  </div>
+                  {category.description && (
+                    <p className="mt-1 line-clamp-1 text-xs text-muted-foreground">{category.description}</p>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Tags Selection */}
+          <div className="space-y-2">
+            <Label className="text-sm font-medium text-foreground">Tags</Label>
+            <div className="flex flex-wrap gap-2">
+              {tags.map(tag => {
+                const isSelected = formData.tagIds?.includes(tag.id);
+                return (
+                  <button
+                    key={tag.id}
+                    type="button"
+                    onClick={() => {
+                      const currentTags = formData.tagIds || [];
+                      const newTags = isSelected ? currentTags.filter(id => id !== tag.id) : [...currentTags, tag.id];
+                      // Also update the legacy tags string for Lens metadata
+                      const selectedTagNames = tags
+                        .filter(t => newTags.includes(t.id))
+                        .map(t => t.name)
+                        .join(",");
+
+                      setFormData({ ...formData, tagIds: newTags, tags: selectedTagNames });
+                    }}
+                    className={`rounded-full px-3 py-1 text-sm font-medium transition-colors ${
+                      isSelected
+                        ? "bg-brand-100 text-brand-700 dark:bg-brand-900/40 dark:text-brand-300"
+                        : "bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700"
+                    }`}
+                  >
+                    {tag.name}
+                  </button>
+                );
+              })}
+            </div>
           </div>
 
           {/* Submit Button */}

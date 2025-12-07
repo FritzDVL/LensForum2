@@ -19,22 +19,37 @@ export interface ThreadsResult {
  */
 export async function getCommunityThreads(
   community: Community,
-  options?: { limit?: number; offset?: number; showAllPosts?: boolean; cursor?: string },
+  options?: {
+    limit?: number;
+    offset?: number;
+    showAllPosts?: boolean;
+    cursor?: string;
+    categorySlug?: string;
+    tagSlug?: string;
+  },
 ): Promise<ThreadsResult> {
   try {
-    const { limit = THREADS_PER_PAGE, offset = 0, showAllPosts = false, cursor = undefined } = options || {};
+    const {
+      limit = THREADS_PER_PAGE,
+      offset = 0,
+      showAllPosts = false,
+      cursor = undefined,
+      categorySlug,
+      tagSlug,
+    } = options || {};
 
     if (showAllPosts) {
-      // 1. Fetch latest posts in Lens for this group
+      // ... (existing logic for showAllPosts)
+      // Note: Filtering by category/tag on Lens Feed directly is harder without an indexer.
+      // For now, we assume filters only apply when showAllPosts=false (Supabase mode).
       const lensResult = await fetchPostsByFeed(community.feed.address, undefined, { sort: "desc", limit, cursor });
+      // ...
+      // (Rest of showAllPosts logic remains same for now)
       const lensPosts = lensResult.posts;
-      // 2. Fetch threads in DB that match those posts
       const dbThreads = await Promise.all(lensPosts.map(post => fetchThread({ rootPostId: post.id })));
-      // 3. Adapt and combine data
       const threadPromises = lensPosts.map(async (post, idx) => {
         const dbThread = dbThreads[idx];
         if (!dbThread) {
-          // Use new adapter for external threads
           return adaptExternalFeedToThread(post as any);
         }
         return await adaptFeedToThread(post.author, dbThread, post);
@@ -48,8 +63,8 @@ export async function getCommunityThreads(
         prevCursor: lensResult.pageInfo?.prev ?? null,
       };
     } else {
-      // 1. Fetch threads from DB
-      const dbThreads = await fetchCommunityThreads(community.id, limit, offset);
+      // 1. Fetch threads from DB with filters
+      const dbThreads = await fetchCommunityThreads(community.id, limit, offset, { categorySlug, tagSlug });
       // 2. Fetch posts in Lens for those threads
       const rootPostIds = dbThreads.map(t => t.root_post_id).filter((id): id is string => !!id);
       const lensPosts = await fetchPostsBatch(rootPostIds);

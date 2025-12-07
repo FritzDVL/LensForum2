@@ -120,6 +120,112 @@ export type Database = {
           },
         ];
       };
+      categories: {
+        Row: {
+          id: string;
+          channel_address: string;
+          name: string;
+          slug: string;
+          color: string;
+          description: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          channel_address: string;
+          name: string;
+          slug: string;
+          color?: string;
+          description?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          channel_address?: string;
+          name?: string;
+          slug?: string;
+          color?: string;
+          description?: string | null;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
+      tags: {
+        Row: {
+          id: string;
+          channel_address: string;
+          name: string;
+          slug: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          channel_address: string;
+          name: string;
+          slug: string;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          channel_address?: string;
+          name?: string;
+          slug?: string;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
+      thread_categories: {
+        Row: {
+          publication_id: string;
+          category_id: string | null;
+          created_at: string;
+        };
+        Insert: {
+          publication_id: string;
+          category_id?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          publication_id?: string;
+          category_id?: string | null;
+          created_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "thread_categories_category_id_fkey";
+            columns: ["category_id"];
+            isOneToOne: false;
+            referencedRelation: "categories";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      thread_tags: {
+        Row: {
+          publication_id: string;
+          tag_id: string;
+          created_at: string;
+        };
+        Insert: {
+          publication_id: string;
+          tag_id: string;
+          created_at?: string;
+        };
+        Update: {
+          publication_id?: string;
+          tag_id?: string;
+          created_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "thread_tags_tag_id_fkey";
+            columns: ["tag_id"];
+            isOneToOne: false;
+            referencedRelation: "tags";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
     };
     Views: {
       [_ in never]: never;

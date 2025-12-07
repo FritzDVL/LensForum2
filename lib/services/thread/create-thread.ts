@@ -82,6 +82,11 @@ export async function createThread(
       };
     }
 
+    // Extract classification data
+    const categoryId = formData.get("categoryId") as string | undefined;
+    const tagIdsString = formData.get("tagIds") as string | null;
+    const tagIds = tagIdsString ? tagIdsString.split(",").filter(Boolean) : undefined;
+
     // 5. Save thread in database
     const authorDb = authorAccount.username?.localName || authorAccount.address;
     const persistedThread = await persistCommunityThread(
@@ -91,6 +96,8 @@ export async function createThread(
       authorDb,
       articleResult.post?.id,
       slug,
+      categoryId,
+      tagIds,
     );
 
     await adaptFeedToThread(authorAccount, persistedThread, rootPost);

@@ -12,7 +12,7 @@ export function CommunityNavActions({ community }: { community: Community }) {
 
   return (
     <div className="mx-auto mb-4 flex max-w-7xl items-center justify-between px-4">
-      <BackNavigationLink href="/communities">Back to Communities</BackNavigationLink>
+      <BackNavigationLink href="/">Back to Home</BackNavigationLink>
       {isModerator && (
         <Button
           asChild
@@ -22,7 +22,7 @@ export function CommunityNavActions({ community }: { community: Community }) {
         >
           <Link href={`/communities/${community.group.address}/edit`}>
             <Edit className="mr-2 h-4 w-4" />
-            Edit Community
+            Edit Channel
           </Link>
         </Button>
       )}
