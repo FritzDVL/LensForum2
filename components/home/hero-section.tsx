@@ -1,7 +1,5 @@
 import Image from "next/image";
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { Compass, Sparkles } from "lucide-react";
+import { Sparkles } from "lucide-react";
 
 export function HeroSection() {
   return (
@@ -32,14 +30,7 @@ export function HeroSection() {
         Connect, create, and contribute to the future of decentralized communities
       </p>
 
-      <div className="flex flex-col gap-4 sm:flex-row sm:justify-center">
-        <Link href="/communities">
-          <Button variant="default" className="rounded-full px-8 py-4 text-lg font-bold shadow-lg">
-            <Compass className="mr-2 h-5 w-5" />
-            Explore Channels
-          </Button>
-        </Link>
-      </div>
+      <div className="flex flex-col gap-4 sm:flex-row sm:justify-center"></div>
     </section>
   );
 }

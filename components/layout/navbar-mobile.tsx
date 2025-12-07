@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { useLogout } from "@/hooks/auth/use-logout";
 import { useSwitchAccount } from "@/hooks/auth/use-switch-account";
 import { useAuthStore } from "@/stores/auth-store";
-import { Bell, Gift, Home, LogOut, Menu, RefreshCw, User, Users, X } from "lucide-react";
+import { Bell, Gift, Home, LogOut, Menu, RefreshCw, User, X } from "lucide-react";
 
 export function NavbarMobile() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -100,19 +100,6 @@ export function NavbarMobile() {
                 >
                   <Home className="mr-2 h-4 w-4" />
                   Home
-                </Button>
-              </Link>
-              <Link href="/communities" className="block px-3">
-                <Button
-                  variant="ghost"
-                  className={`w-full justify-start rounded-full transition-all duration-300 ${
-                    pathname === "/communities"
-                      ? "bg-brand-600 text-white shadow-md hover:bg-brand-700"
-                      : "hover:bg-accent hover:text-accent-foreground"
-                  }`}
-                >
-                  <Users className="mr-2 h-4 w-4" />
-                  Channels
                 </Button>
               </Link>
             </div>
