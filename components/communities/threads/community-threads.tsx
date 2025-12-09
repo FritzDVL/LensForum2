@@ -3,7 +3,6 @@
 import { CommunityHeader } from "@/components/communities/display/community-header";
 import { CommunityNavActions } from "@/components/communities/display/community-nav-actions";
 import { CommunityThreadsList } from "@/components/communities/threads/community-threads-list";
-import { ThreadFilters } from "@/components/communities/threads/thread-filters";
 import { Pagination } from "@/components/shared/pagination";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { useThreadsPaginated } from "@/hooks/threads/use-threads-paginated";
@@ -36,9 +35,7 @@ export function CommunityThreads({
     <main className="mx-auto max-w-7xl px-4 py-8">
       <div className="mx-auto max-w-4xl">
         <CommunityNavActions community={community} />
-        <CommunityHeader community={community} />
-
-        <ThreadFilters categories={categories} tags={tags} />
+        <CommunityHeader community={community} categories={categories} tags={tags} />
 
         {loading ? (
           <div className="flex w-full items-center justify-center py-12">

@@ -52,7 +52,7 @@ export default async function CategoriesPage({ params }: { params: Promise<{ add
     <ProtectedRoute>
       <main className="mx-auto max-w-4xl px-4 py-8">
         <CommunityNavActions community={community} />
-        <CommunityHeader community={community} />
+        <CommunityHeader community={community} categories={categories} tags={[]} />
 
         <div className="mt-8 space-y-8">
           <h2 className="text-2xl font-bold text-foreground">Categories</h2>
@@ -97,7 +97,7 @@ export default async function CategoriesPage({ params }: { params: Promise<{ add
                           <div className="mt-1 flex items-center gap-2 text-xs text-muted-foreground">
                             <span>{new Date(thread.created_at).toLocaleDateString()}</span>
                             <span>•</span>
-                            <span>by {thread.author.handle?.localName || thread.author.id.slice(0, 8)}</span>
+                            <span>by {thread.author.username?.localName || thread.author.address.slice(0, 8)}</span>
                           </div>
                         </div>
                         <div className="flex shrink-0 items-center gap-1 text-sm text-muted-foreground">

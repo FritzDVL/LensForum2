@@ -46,7 +46,7 @@ export function ThreadFilters({ categories, tags }: ThreadFiltersProps) {
       {/* Navigation Tabs */}
       <div className="flex items-center space-x-1 rounded-lg bg-slate-100 p-1 dark:bg-gray-800">
         <Button
-          variant={!currentCategorySlug && !currentTagSlug ? "white" : "ghost"}
+          variant={!currentCategorySlug && !currentTagSlug ? "secondary" : "ghost"}
           size="sm"
           onClick={() => router.push("?")}
           className={`rounded-md px-3 text-sm font-medium ${!currentCategorySlug && !currentTagSlug ? "shadow-sm" : "text-muted-foreground hover:text-foreground"}`}
