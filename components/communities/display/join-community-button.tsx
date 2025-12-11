@@ -62,10 +62,9 @@ export function JoinCommunityButton({ community, onStatusChange }: JoinCommunity
         onClick={handleJoinRequest}
         size="sm"
         variant="default"
-        className="h-8 px-3 text-xs font-medium transition-all duration-150"
+        className="h-9 px-4 text-sm font-medium"
       >
-        <LogIn className="mr-1.5 h-3 w-3" />
-        <span className="hidden md:inline">Request join</span>
+        Request join
       </Button>
     );
   }
@@ -76,11 +75,9 @@ export function JoinCommunityButton({ community, onStatusChange }: JoinCommunity
       onClick={handleJoin}
       size="sm"
       variant="default"
-      className="h-8 px-3 text-xs font-medium transition-all duration-150"
+      className="h-9 px-4 text-sm font-medium"
     >
-      <LogIn className="mr-1.5 h-3 w-3" />
-      <span className="hidden md:inline">Join</span>
-      <span className="md:hidden">Join</span>
+      Join
     </Button>
   );
 }

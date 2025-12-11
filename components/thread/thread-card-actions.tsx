@@ -92,54 +92,59 @@ export function ThreadCardActions({ thread, community }: ThreadCardActionsProps)
 
   return (
     <div>
-      <div className="mt-6 flex flex-col gap-3 pt-4 sm:flex-row sm:items-center sm:justify-between">
+      <div className="mt-6 flex flex-col pt-4 sm:flex-row sm:items-center sm:justify-between">
         {/* Left: Stats Tips */}
-        <div className="flex items-center justify-start gap-4 text-muted-foreground sm:flex-1">
+        <div className="flex items-center justify-start gap-4 text-muted-foreground">
           <div className="flex items-center gap-1">
             <Coins className="h-4 w-4" />
             <span className="text-sm">{thread.rootPost?.stats.tips}</span>
           </div>
         </div>
-        {/* Center: ThreadVoting */}
-        <div className="mt-2 flex items-center justify-start sm:mt-0 sm:flex-1 sm:justify-center">
+
+        {/* Right Group: Voting + Actions */}
+        <div className="mt-4 flex flex-1 items-center justify-end gap-6 sm:mt-0">
+          {/* Voting - Moved here */}
           {threadPostId && <ThreadVoting postid={postId(threadPostId)} />}
-        </div>
-        {/* Right: Join Community, Reply, Tip, Share */}
-        <div className="mt-2 flex w-full items-center justify-start gap-2 sm:mt-0 sm:w-auto sm:flex-1 sm:justify-end">
-          {canReply && (
+
+          {/* Actions */}
+          <div className="flex items-center gap-2">
+            {canReply && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-green-600 hover:text-green-700 dark:text-green-400 dark:hover:text-green-300"
+                onClick={() => setReplyingTo("main")}
+                disabled={!isLoggedIn}
+              >
+                <ReplyIcon className="mr-2 h-4 w-4" />
+                Reply
+              </Button>
+            )}
+            {canTip && (
+              <div className="min-w-0">
+                <TipGhoPopover to={threadPostId} />
+              </div>
+            )}
             <Button
               variant="ghost"
               size="sm"
-              className="text-green-600 hover:text-green-700 dark:text-green-400 dark:hover:text-green-300"
-              onClick={() => setReplyingTo("main")}
-              disabled={!isLoggedIn}
+              onClick={handleShare}
+              className="min-w-0 text-green-600 hover:text-green-700 dark:text-green-400 dark:hover:text-green-300"
             >
-              <ReplyIcon className="mr-2 h-4 w-4" />
-              Reply
+              <Share className="mr-2 h-4 w-4" />
+              <span className="truncate">Share</span>
             </Button>
-          )}
-          {canTip && (
-            <div className="min-w-0">
-              <TipGhoPopover to={threadPostId} />
-            </div>
-          )}
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={handleShare}
-            className="min-w-0 text-green-600 hover:text-green-700 dark:text-green-400 dark:hover:text-green-300"
-          >
-            <Share className="mr-2 h-4 w-4" />
-            <span className="truncate">Share</span>
-          </Button>
-          <ThreadShareDialog
-            open={shareDialogOpen}
-            onClose={() => setShareDialogOpen(false)}
-            threadUrl={threadUrl}
-            onPostToLens={handlePostToLens}
-          />
+          </div>
         </div>
       </div>
+
+      <ThreadShareDialog
+        open={shareDialogOpen}
+        onClose={() => setShareDialogOpen(false)}
+        threadUrl={threadUrl}
+        onPostToLens={handlePostToLens}
+      />
+
       {/* Reply Box (always below actions row) */}
       {replyingTo === "main" && (
         <>

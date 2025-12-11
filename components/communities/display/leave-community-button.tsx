@@ -26,11 +26,9 @@ export function LeaveCommunityButton({ community, onDialogOpen }: LeaveCommunity
       onClick={handleOpenLeaveDialog}
       size="sm"
       variant="outline"
-      className="h-8 px-3 text-xs font-medium transition-all duration-150"
+      className="h-9 px-4 text-sm font-medium"
     >
-      <LogOut className="mr-1.5 h-3 w-3" />
-      <span className="hidden md:inline">Leave</span>
-      <span className="md:hidden">Leave</span>
+      Leave
     </Button>
   );
 }

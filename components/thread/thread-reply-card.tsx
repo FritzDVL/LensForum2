@@ -178,7 +178,7 @@ export function ThreadReplyCard({ reply, thread, community }: ThreadReplyCardPro
                 />
               )}
               {showReplies && (
-                <div className="ml-6 mt-2 space-y-2">
+                <div className="mt-2 space-y-2 border-l-2 border-slate-100 pl-4 dark:border-gray-700">
                   {repliesError && <div className="text-xs text-red-500">{repliesError}</div>}
                   {replies.length === 0 && !repliesError && (
                     <div className="text-xs text-muted-foreground">No replies yet.</div>

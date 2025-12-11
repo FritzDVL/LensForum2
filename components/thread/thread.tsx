@@ -6,7 +6,6 @@ import { JoinCommunityAnnouncement } from "@/components/thread/join-community-an
 import { ThreadActions } from "@/components/thread/thread-actions";
 import { ThreadCard } from "@/components/thread/thread-card";
 import { ThreadRepliesList } from "@/components/thread/thread-replies-list";
-import { ThreadSidebar } from "@/components/thread/thread-sidebar";
 import { useCommunityMembership } from "@/hooks/communities/use-community-membership";
 import { useJoinCommunity } from "@/hooks/communities/use-join-community";
 import { Community } from "@/lib/domain/communities/types";
@@ -39,20 +38,25 @@ export function Thread({ community, thread }: ThreadProps) {
   };
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-8">
-      <div className="grid grid-cols-1 gap-8 lg:grid-cols-4">
-        <div className="lg:col-span-3">
-          {!isMember && !isLoading && (
-            <JoinCommunityAnnouncement isLoading={isJoinLoading} onJoinCommunity={handleJoin} />
-          )}
-          <ThreadActions thread={thread} />
-          <ThreadCard thread={thread} community={community} />
-          <ThreadRepliesList thread={thread} community={community} />
+    <div className="mx-auto max-w-6xl px-4 py-8">
+      {/* Community Announcement (if not member) */}
+      {!isMember && !isLoading && (
+        <div className="mb-6">
+          <JoinCommunityAnnouncement isLoading={isJoinLoading} onJoinCommunity={handleJoin} />
         </div>
-        <div className="hidden lg:block lg:pt-[54px]">
-          <ThreadSidebar community={community} />
-        </div>
-      </div>
+      )}
+
+      {/* Top Actions */}
+      <ThreadActions thread={thread} />
+
+      {/* Main Title - Extracted from card for hierarchy */}
+      <h1 className="mb-6 mt-4 text-3xl font-extrabold leading-tight text-foreground md:text-4xl">{thread.title}</h1>
+
+      {/* Main Post Card (Title enabled inside as well per request) */}
+      <ThreadCard thread={thread} community={community} hideTitle={false} />
+
+      {/* Flattened Replies List */}
+      <ThreadRepliesList thread={thread} community={community} />
     </div>
   );
 }
