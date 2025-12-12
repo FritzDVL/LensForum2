@@ -1,5 +1,5 @@
 import type { Reply as ReplyType } from "@/lib/domain/replies/types";
-import { createReply } from "@/lib/services/reply/create-reply";
+import { CreateReplyOptions, createReply } from "@/lib/services/reply/create-reply";
 import { useAuthStore } from "@/stores/auth-store";
 import type { Address } from "@/types/common";
 import { useSessionClient } from "@lens-protocol/react";
@@ -7,18 +7,23 @@ import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { useWalletClient } from "wagmi";
 
+export interface CreateReplyParams {
+  content: string;
+  threadRootPostId: string; // Always reply to root post
+  threadAddress: Address;
+  threadId: string;
+  replyToPostId?: string; // Optional: for context/mention
+  replyToUsername?: string; // Optional: for @mention
+  replyToAddress?: Address; // Optional: for notifications
+}
+
 export function useReplyCreate() {
   const { account } = useAuthStore();
   const sessionClient = useSessionClient();
   const walletClient = useWalletClient();
   const queryClient = useQueryClient();
 
-  const createReplyWithService = async (
-    to: string,
-    content: string,
-    feedAddress: Address,
-    threadId: string,
-  ): Promise<ReplyType | null> => {
+  const createReplyWithService = async (params: CreateReplyParams): Promise<ReplyType | null> => {
     if (!sessionClient.data) {
       toast.error("Not logged in", { description: "Please log in to reply." });
       return null;
@@ -38,7 +43,22 @@ export function useReplyCreate() {
     try {
       loadingToastId = toast.loading("Uploading your reply...");
 
-      const result = await createReply(to, content, feedAddress, threadId, sessionClient.data, walletClient.data);
+      const options: CreateReplyOptions = {
+        rootPostId: params.threadRootPostId,
+        replyToPostId: params.replyToPostId,
+        replyToUsername: params.replyToUsername,
+        replyToAddress: params.replyToAddress,
+      };
+
+      const result = await createReply(
+        params.content,
+        params.threadAddress,
+        params.threadId,
+        sessionClient.data,
+        walletClient.data,
+        options,
+      );
+
       if (!result.success) {
         const errorMsg = result.error || "Failed to create reply";
         if (errorMsg.includes("Not all rules satisfied")) {
@@ -50,7 +70,7 @@ export function useReplyCreate() {
       }
 
       toast.success("Reply posted!");
-      await queryClient.invalidateQueries({ queryKey: ["thread-replies", threadId] });
+      await queryClient.invalidateQueries({ queryKey: ["thread-replies", params.threadId] });
       return result.reply || null;
     } catch (error) {
       console.error("Error creating reply:", error);

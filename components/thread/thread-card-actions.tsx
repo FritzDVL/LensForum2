@@ -57,12 +57,13 @@ export function ThreadCardActions({ thread, community }: ThreadCardActionsProps)
   const handleReply = async () => {
     if (!thread || !thread.rootPost || !thread.rootPost.id) return;
     if (replyingTo && replyContent[replyingTo]) {
-      const reply = await createReply(
-        thread.rootPost.id,
-        replyContent[replyingTo],
-        thread.rootPost.feed.address,
-        thread.id,
-      );
+      const reply = await createReply({
+        content: replyContent[replyingTo],
+        threadRootPostId: thread.rootPost.id,
+        threadAddress: thread.rootPost.feed.address,
+        threadId: thread.id,
+        // No replyToPostId since this is a top-level reply to the thread
+      });
       if (reply) {
         setReplyingTo(null);
         setReplyContent(c => ({ ...c, [replyingTo]: "" }));

@@ -3,23 +3,22 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { ReplyVoting } from "../reply/reply-voting";
+import { InReplyToIndicator } from "./in-reply-to-indicator";
 import { ThreadReplyBox } from "./thread-reply-box";
 import { ThreadReplyModeratorActions } from "./thread-reply-moderator-actions";
 import { ContentRenderer } from "@/components/shared/content-renderer";
 import { ThreadReplyActions } from "@/components/thread/thread-reply-actions";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useReplyCreate } from "@/hooks/replies/use-reply-create";
 import { Community } from "@/lib/domain/communities/types";
 import { getReplyContent } from "@/lib/domain/replies/content";
+import { getReplyContext } from "@/lib/domain/replies/context";
 import { Reply } from "@/lib/domain/replies/types";
 import { Thread } from "@/lib/domain/threads/types";
-import { getRepliesByParentId } from "@/lib/services/reply/get-replies-by-parent-id";
 import { getTimeAgo } from "@/lib/shared/utils";
-import { postId, useSessionClient } from "@lens-protocol/react";
+import { postId } from "@lens-protocol/react";
 import { AnimatePresence, motion } from "framer-motion";
-import { MessageCircle } from "lucide-react";
 
 interface ThreadReplyCardProps {
   reply: Reply;
@@ -33,50 +32,26 @@ export function ThreadReplyCard({ reply, thread, community }: ThreadReplyCardPro
 
   const [showReplyBox, setShowReplyBox] = useState(false);
   const [replyContent, setReplyContent] = useState("");
-  const [loadingReplies, setLoadingReplies] = useState(false);
-  const [showReplies, setShowReplies] = useState(false);
-  const [replies, setReplies] = useState<Reply[]>([]);
-  const [repliesError, setRepliesError] = useState<string | null>(null);
-  const [localReplyCount, setLocalReplyCount] = useState(reply.post.stats.comments);
   const [showPlusOne, setShowPlusOne] = useState(false);
 
-  useEffect(() => {
-    setLocalReplyCount(reply.post.stats.comments);
-  }, [reply.post.stats.comments]);
-
   const { createReply } = useReplyCreate();
-  const sessionClient = useSessionClient();
 
   const handleReply = async () => {
     if (!replyContent.trim()) return;
     try {
-      await createReply(reply.id, replyContent, threadAddress, thread.id);
+      await createReply({
+        content: replyContent,
+        threadRootPostId: thread.rootPost.id, // Always reply to root
+        threadAddress,
+        threadId: thread.id,
+        replyToPostId: reply.id, // Track who we're replying to
+        replyToUsername: reply.post.author.username?.value,
+        replyToAddress: reply.post.author.address,
+      });
       setReplyContent("");
       setShowReplyBox(false);
-      setLocalReplyCount(c => c + 1);
       setShowPlusOne(true);
     } finally {
-    }
-  };
-
-  const handleLoadReplies = async () => {
-    if (loadingReplies) return;
-
-    setLoadingReplies(true);
-    setRepliesError(null);
-    try {
-      const result = await getRepliesByParentId(reply.post.id, sessionClient.data ?? undefined);
-      if (result.success) {
-        setReplies(result.replies ?? []);
-      } else {
-        setRepliesError(result.error || "Failed to load replies.");
-      }
-      setShowReplies(true);
-    } catch (error) {
-      setRepliesError("Failed to load replies.");
-      console.error("Failed to load replies:", error);
-    } finally {
-      setLoadingReplies(false);
     }
   };
 
@@ -123,6 +98,14 @@ export function ThreadReplyCard({ reply, thread, community }: ThreadReplyCardPro
                 </div>
               </div>
 
+              {/* In Reply To Indicator */}
+              {(() => {
+                const replyContext = getReplyContext(reply.post);
+                return replyContext?.replyToUsername ? (
+                  <InReplyToIndicator username={replyContext.replyToUsername} />
+                ) : null;
+              })()}
+
               {/* Content */}
               <ContentRenderer content={{ content, image, video }} className="rich-text-content mb-2" />
               {/* Reply button and tip button bottom */}
@@ -142,20 +125,6 @@ export function ThreadReplyCard({ reply, thread, community }: ThreadReplyCardPro
                       </motion.span>
                     )}
                   </AnimatePresence>
-                  {localReplyCount > 0 && (
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={handleLoadReplies}
-                      disabled={loadingReplies}
-                      className="h-auto p-1 text-xs text-muted-foreground hover:text-foreground"
-                    >
-                      <MessageCircle className="mr-1 h-3 w-3" />
-                      {loadingReplies
-                        ? "Loading..."
-                        : `${localReplyCount} ${localReplyCount === 1 ? "reply" : "replies"}`}
-                    </Button>
-                  )}
                 </div>
                 <div className="flex w-full justify-end sm:w-auto">
                   <ThreadReplyActions
@@ -176,17 +145,6 @@ export function ThreadReplyCard({ reply, thread, community }: ThreadReplyCardPro
                   onSubmit={handleReply}
                   onChange={setReplyContent}
                 />
-              )}
-              {showReplies && (
-                <div className="mt-2 space-y-2 border-l-2 border-slate-100 pl-4 dark:border-gray-700">
-                  {repliesError && <div className="text-xs text-red-500">{repliesError}</div>}
-                  {replies.length === 0 && !repliesError && (
-                    <div className="text-xs text-muted-foreground">No replies yet.</div>
-                  )}
-                  {replies.map(nestedReply => (
-                    <ThreadReplyCard key={nestedReply.id} reply={nestedReply} thread={thread} community={community} />
-                  ))}
-                </div>
               )}
             </div>
           </div>

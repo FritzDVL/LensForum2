@@ -18,16 +18,24 @@ export interface CreateReplyResult {
   error?: string;
 }
 
+export interface CreateReplyOptions {
+  rootPostId: string; // The thread's root post ID (always comment on this)
+  replyToPostId?: string; // Optional: The specific post being replied to (for context)
+  replyToUsername?: string; // Optional: Username of person being replied to
+  replyToAddress?: Address; // Optional: Address of person being replied to
+}
+
 /**
- * Creates a reply using existing logic from useReplyCreate hook
+ * Creates a reply using flat chronological structure.
+ * All replies comment on the root post, with optional mention metadata for context.
  */
 export async function createReply(
-  parentId: string,
   content: string,
   threadAddress: Address,
   threadId: string,
   sessionClient: SessionClient,
   walletClient: WalletClient,
+  options: CreateReplyOptions,
 ): Promise<CreateReplyResult> {
   try {
     if (!sessionClient) {
@@ -37,17 +45,37 @@ export async function createReply(
       };
     }
 
-    // 1. Create metadata
-    const metadata = textOnly({ content });
+    // 1. Prepare content with mention if replying to someone
+    let finalContent = content;
+    if (options.replyToUsername) {
+      // Add @mention at the start if not already present
+      if (!content.trim().startsWith(`@${options.replyToUsername}`)) {
+        finalContent = `@${options.replyToUsername} ${content}`;
+      }
+    }
 
-    // 2. Upload metadata to storage
+    // 2. Create metadata with tags for reply context
+    const tags: string[] = [];
+    if (options.replyToPostId) {
+      tags.push(`replyTo:${options.replyToPostId}`);
+    }
+    if (options.replyToUsername) {
+      tags.push(`replyToUser:${options.replyToUsername}`);
+    }
+
+    const metadata = textOnly({
+      content: finalContent,
+      ...(tags.length > 0 && { tags }),
+    });
+
+    // 3. Upload metadata to storage
     const acl = immutable(lensChain.id);
     const { uri: replyUri } = await storageClient.uploadAsJson(metadata, { acl });
 
-    // 3. Post to Lens Protocol - using the correct API structure
+    // 4. Post to Lens Protocol - ALWAYS comment on root post for flat structure
     const result = await post(sessionClient, {
       contentUri: uri(replyUri),
-      commentOn: { post: postId(parentId) },
+      commentOn: { post: postId(options.rootPostId) }, // Always root post
       feed: evmAddress(threadAddress),
     })
       .andThen(handleOperationWith(walletClient))
@@ -67,7 +95,7 @@ export async function createReply(
 
     const createdPost = result.value as Post;
 
-    // 4. Increment thread replies count
+    // 5. Increment thread replies count
     try {
       await incrementThreadRepliesCount(threadId);
     } catch (error) {
@@ -75,7 +103,7 @@ export async function createReply(
       // Don't fail the entire operation for this
     }
 
-    // 5. Transform post to reply - using the correct author parameter
+    // 6. Transform post to reply - using the correct author parameter
     const reply = adaptPostToReply(createdPost);
 
     return {
