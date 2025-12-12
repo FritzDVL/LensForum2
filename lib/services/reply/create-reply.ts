@@ -54,18 +54,9 @@ export async function createReply(
       }
     }
 
-    // 2. Create metadata with tags for reply context
-    const tags: string[] = [];
-    if (options.replyToPostId) {
-      tags.push(`replyTo:${options.replyToPostId}`);
-    }
-    if (options.replyToUsername) {
-      tags.push(`replyToUser:${options.replyToUsername}`);
-    }
-
+    // 2. Create simple text-only metadata (no custom tags for now)
     const metadata = textOnly({
       content: finalContent,
-      ...(tags.length > 0 && { tags }),
     });
 
     // 3. Upload metadata to storage

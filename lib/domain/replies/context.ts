@@ -1,34 +1,31 @@
 import { Post } from "@lens-protocol/client";
 
 export interface ReplyContext {
-  replyToPostId?: string;
   replyToUsername?: string;
 }
 
 /**
- * Extract reply context from post metadata tags
- * Tags format: "replyTo:postId" and "replyToUser:username"
+ * Extract reply context from post content by parsing @mentions
+ * If content starts with @username, we assume it's a reply to that user
  */
 export function getReplyContext(post: Post): ReplyContext | null {
-  // Check if metadata has tags (only TextOnlyMetadata has tags)
+  // Check if metadata has content
   if (!post.metadata || post.metadata.__typename !== "TextOnlyMetadata") {
     return null;
   }
 
-  const tags = post.metadata.tags;
-  if (!tags || tags.length === 0) {
+  const content = post.metadata.content;
+  if (!content) {
     return null;
   }
 
-  const context: ReplyContext = {};
-
-  for (const tag of tags) {
-    if (tag.startsWith("replyTo:")) {
-      context.replyToPostId = tag.replace("replyTo:", "");
-    } else if (tag.startsWith("replyToUser:")) {
-      context.replyToUsername = tag.replace("replyToUser:", "");
-    }
+  // Check if content starts with @mention
+  const mentionMatch = content.trim().match(/^@(\w+)/);
+  if (mentionMatch) {
+    return {
+      replyToUsername: mentionMatch[1],
+    };
   }
 
-  return context.replyToPostId || context.replyToUsername ? context : null;
+  return null;
 }
