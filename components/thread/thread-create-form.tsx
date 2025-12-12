@@ -1,18 +1,16 @@
 "use client";
 
+import { useMemo } from "react";
 import { TextEditor } from "@/components/editor/text-editor";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Textarea } from "@/components/ui/textarea";
 import { useThreadCreateForm } from "@/hooks/forms/use-thread-create-form";
 import { Category, Tag } from "@/lib/domain/classification/types";
 import { Community } from "@/lib/domain/communities/types";
 import { useAuthStore } from "@/stores/auth-store";
 import { Send } from "lucide-react";
-import ReactMarkdown from "react-markdown";
 
 interface ThreadCreateFormProps {
   community: Community;
@@ -34,6 +32,11 @@ export function ThreadCreateForm({ community, categories, tags }: ThreadCreateFo
     setFormData(newFormData);
     handleSubmit(e, newFormData);
   };
+
+  // Memoize the initial content to ensure it doesn't change on re-renders
+  // causing the editor to reset.
+  // If formData.content is empty string on mount, it stays empty string.
+  const initialContent = useMemo(() => formData.content, []);
 
   return (
     <Card className="rounded-3xl border border-brand-200/60 bg-white backdrop-blur-sm dark:border-gray-700/60 dark:bg-gray-800">
@@ -69,42 +72,18 @@ export function ThreadCreateForm({ community, categories, tags }: ThreadCreateFo
               maxLength={100}
             />
           </div>
-          {/* Content Editor */}
+          {/* Content Editor - Simplified without Tabs */}
           <div className="space-y-2">
             <Label htmlFor="content" className="text-sm font-medium text-foreground">
               Content
             </Label>
-
-            <Tabs defaultValue="visual" className="w-full">
-              <div className="flex items-center justify-between pb-2">
-                <TabsList className="grid w-64 grid-cols-3 bg-slate-100 dark:bg-gray-800">
-                  <TabsTrigger value="visual">Visual</TabsTrigger>
-                  <TabsTrigger value="markdown">Markdown</TabsTrigger>
-                  <TabsTrigger value="preview">Preview</TabsTrigger>
-                </TabsList>
-              </div>
-
-              <TabsContent value="visual" className="mt-0">
-                <div className="rounded-2xl border border-brand-200/40 bg-white/50 backdrop-blur-sm dark:bg-gray-800">
-                  <TextEditor initialValue={formData.content} onChange={value => handleChange("content", value)} />
-                </div>
-              </TabsContent>
-
-              <TabsContent value="markdown" className="mt-0">
-                <Textarea
-                  value={formData.content}
-                  onChange={e => handleChange("content", e.target.value)}
-                  placeholder="Write in markdown..."
-                  className="min-h-[300px] w-full rounded-2xl border-brand-200/40 bg-white/50 font-mono text-sm backdrop-blur-sm focus:ring-brand-500/20 dark:bg-gray-800"
-                />
-              </TabsContent>
-
-              <TabsContent value="preview" className="mt-0">
-                <div className="prose min-h-[300px] w-full max-w-none rounded-2xl border border-border bg-white px-8 py-6 dark:prose-invert dark:bg-gray-800">
-                  <ReactMarkdown>{formData.content || "*Nothing to preview*"}</ReactMarkdown>
-                </div>
-              </TabsContent>
-            </Tabs>
+            <div className="rounded-2xl border border-brand-200/40 bg-white/50 backdrop-blur-sm dark:bg-gray-800">
+              {/* 
+                  Passing initialValue only (not value) to let Editor manage its own history 
+                  and avoid resetting cursor on every keystroke. 
+                */}
+              <TextEditor initialValue={initialContent} onChange={value => handleChange("content", value)} />
+            </div>
           </div>
 
           {/* Category Selector */}

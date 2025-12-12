@@ -6,6 +6,7 @@ import { getTags } from "@/lib/services/classification/get-tags";
 import { getCommunity } from "@/lib/services/community/get-community";
 import { getCommunityThreads } from "@/lib/services/thread/get-community-threads";
 import { THREADS_PER_PAGE } from "@/lib/shared/constants";
+import { toPlainObject } from "@/lib/shared/utils";
 import { Address } from "@/types/common";
 
 export default async function CommunityPage({ params }: { params: Promise<{ address: string }> }) {
@@ -45,11 +46,11 @@ export default async function CommunityPage({ params }: { params: Promise<{ addr
   return (
     <ProtectedRoute>
       <CommunityThreads
-        community={community}
-        threads={threads}
+        community={toPlainObject(community)}
+        threads={toPlainObject(threads)}
         initialCrosspostEnabled={crosspostEnabledCookie}
-        categories={categories}
-        tags={tags}
+        categories={toPlainObject(categories)}
+        tags={toPlainObject(tags)}
       />
     </ProtectedRoute>
   );

@@ -3,6 +3,7 @@ import { Thread } from "@/components/thread/thread";
 import { getThreadTitleAndSummary } from "@/lib/domain/threads/content";
 import { getCommunity } from "@/lib/services/community/get-community";
 import { getThread, getThreadBySlug } from "@/lib/services/thread/get-thread";
+import { toPlainObject } from "@/lib/shared/utils";
 import { Address } from "@/types/common";
 
 const MAX_TITLE_LENGTH = 70;
@@ -94,7 +95,7 @@ export default async function ThreadPage({ params }: { params: { slug: string } 
 
   return (
     <ProtectedRoute>
-      <Thread thread={thread} community={community.community} />
+      <Thread thread={toPlainObject(thread)} community={toPlainObject(community.community)} />
     </ProtectedRoute>
   );
 }

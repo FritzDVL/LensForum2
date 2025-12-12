@@ -54,7 +54,8 @@ export function CommunityHeaderActions({ communityAddr }: CommunityHeaderActions
       </div>
       <div className="flex flex-row items-center gap-1.5">
         <JoinCommunityButton community={community} onStatusChange={refetchCommunity} />
-        <LeaveCommunityButton community={community} onDialogOpen={handleDialogOpen} />
+        {/* Leave button hidden as requested - planned for profile toggle */}
+        {/* <LeaveCommunityButton community={community} onDialogOpen={handleDialogOpen} /> */}
       </div>
       <LeaveCommunityDialog
         open={showLeaveDialog}

@@ -53,3 +53,7 @@ export function compactAddress(address: string): string {
   if (!address || address.length < 10) return address;
   return `${address.slice(0, 6)}...${address.slice(-4)}`;
 }
+
+export function toPlainObject<T>(obj: T): T {
+  return JSON.parse(JSON.stringify(obj));
+}

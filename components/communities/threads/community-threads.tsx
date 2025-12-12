@@ -33,7 +33,7 @@ export function CommunityThreads({
 
   return (
     <main className="mx-auto max-w-7xl px-4 py-8">
-      <div className="mx-auto max-w-4xl">
+      <div className="w-full">
         <CommunityNavActions community={community} />
         <CommunityHeader community={community} categories={categories} tags={tags} />
 
