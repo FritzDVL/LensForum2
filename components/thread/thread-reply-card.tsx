@@ -4,13 +4,11 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { ReplyVoting } from "../reply/reply-voting";
 import { InReplyToIndicator } from "./in-reply-to-indicator";
-import { ThreadReplyDialog } from "./thread-reply-dialog";
 import { ThreadReplyModeratorActions } from "./thread-reply-moderator-actions";
 import { ContentRenderer } from "@/components/shared/content-renderer";
 import { ThreadReplyActions } from "@/components/thread/thread-reply-actions";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent } from "@/components/ui/card";
-import { useReplyCreate } from "@/hooks/replies/use-reply-create";
 import { Community } from "@/lib/domain/communities/types";
 import { getReplyContent } from "@/lib/domain/replies/content";
 import { getReplyContext } from "@/lib/domain/replies/context";
@@ -24,28 +22,19 @@ interface ThreadReplyCardProps {
   reply: Reply;
   thread: Thread;
   community?: Community;
+  onReplyClick?: () => void;
 }
 
-export function ThreadReplyCard({ reply, thread, community }: ThreadReplyCardProps) {
+export function ThreadReplyCard({ reply, thread, community, onReplyClick }: ThreadReplyCardProps) {
   const { content, image, video } = getReplyContent(reply.post);
-  const threadAddress = thread.rootPost.feed.address;
 
-  const [showReplyDialog, setShowReplyDialog] = useState(false);
   const [showPlusOne, setShowPlusOne] = useState(false);
 
-  const { createReply } = useReplyCreate();
-
-  const handleReply = async (content: string) => {
-    await createReply({
-      content,
-      threadRootPostId: thread.rootPost.id, // Always reply to root
-      threadAddress,
-      threadId: thread.id,
-      replyToPostId: reply.id, // Track who we're replying to
-      replyToUsername: reply.post.author.username?.value,
-      replyToAddress: reply.post.author.address,
-    });
-    setShowPlusOne(true);
+  const handleReplyClick = () => {
+    if (onReplyClick) {
+      onReplyClick();
+      setShowPlusOne(true);
+    }
   };
 
   useEffect(() => {
@@ -122,7 +111,7 @@ export function ThreadReplyCard({ reply, thread, community }: ThreadReplyCardPro
                 <div className="flex w-full justify-end sm:w-auto">
                   <ThreadReplyActions
                     replyId={reply.id}
-                    setReplyingTo={() => setShowReplyDialog(true)}
+                    setReplyingTo={handleReplyClick}
                     canReply={canReply}
                     canTip={!!canTip}
                   />
@@ -132,16 +121,6 @@ export function ThreadReplyCard({ reply, thread, community }: ThreadReplyCardPro
           </div>
         </CardContent>
       </Card>
-
-      {/* Reply Dialog */}
-      <ThreadReplyDialog
-        open={showReplyDialog}
-        onClose={() => setShowReplyDialog(false)}
-        onSubmit={handleReply}
-        replyingToUsername={reply.post.author.username?.value}
-        replyingToAvatar={reply.post.author.metadata?.picture}
-        replyingToContent={content}
-      />
     </div>
   );
 }
