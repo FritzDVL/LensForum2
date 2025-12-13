@@ -19,8 +19,8 @@ export function getReplyContext(post: Post): ReplyContext | null {
     return null;
   }
 
-  // Check if content starts with @mention
-  const mentionMatch = content.trim().match(/^@(\w+)/);
+  // Check if content starts with @mention (supports namespaced handles like @lens/user)
+  const mentionMatch = content.trim().match(/^@([\w\/-]+)/);
   if (mentionMatch) {
     return {
       replyToUsername: mentionMatch[1],
