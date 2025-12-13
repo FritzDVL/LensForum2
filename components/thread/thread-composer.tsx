@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { TextEditor } from "@/components/editor/text-editor";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -13,7 +13,6 @@ interface ThreadComposerProps {
   replyingToUsername?: string;
   replyingToAvatar?: string;
   replyingToContent?: string;
-  placeholder?: string;
 }
 
 export function ThreadComposer({
@@ -22,10 +21,14 @@ export function ThreadComposer({
   replyingToUsername,
   replyingToAvatar,
   replyingToContent,
-  placeholder = "Write your reply...",
 }: ThreadComposerProps) {
   const [content, setContent] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Compute initial value only once to prevent editor remounting
+  const initialValue = useMemo(() => {
+    return replyingToUsername ? `@${replyingToUsername} ` : "";
+  }, [replyingToUsername]);
 
   const handleSubmit = async () => {
     if (!content.trim()) return;
@@ -79,10 +82,7 @@ export function ThreadComposer({
 
         {/* Rich Text Editor */}
         <div className="mb-4">
-          <TextEditor
-            onChange={setContent}
-            initialValue={replyingToUsername && !content ? `@${replyingToUsername} ` : content || ""}
-          />
+          <TextEditor onChange={setContent} initialValue={initialValue} />
         </div>
 
         {/* Actions */}
