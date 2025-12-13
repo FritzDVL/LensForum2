@@ -5,9 +5,25 @@ import { CornerDownRight } from "lucide-react";
 
 interface InReplyToIndicatorProps {
   username: string;
+  postId?: string;
 }
 
-export function InReplyToIndicator({ username }: InReplyToIndicatorProps) {
+export function InReplyToIndicator({ username, postId }: InReplyToIndicatorProps) {
+  const handleScroll = (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (postId) {
+      const element = document.getElementById(postId);
+      if (element) {
+        element.scrollIntoView({ behavior: "smooth", block: "center" });
+        // Add highlight effect
+        element.classList.add("bg-green-50/50", "dark:bg-green-900/20", "transition-colors", "duration-500");
+        setTimeout(() => {
+          element.classList.remove("bg-green-50/50", "dark:bg-green-900/20");
+        }, 2000);
+      }
+    }
+  };
+
   return (
     <div className="mb-2 flex items-center gap-1.5 text-xs text-muted-foreground">
       <CornerDownRight className="h-3 w-3" />
@@ -18,6 +34,15 @@ export function InReplyToIndicator({ username }: InReplyToIndicatorProps) {
       >
         @{username}
       </Link>
+
+      {postId && (
+        <>
+          <span>•</span>
+          <button onClick={handleScroll} className="flex items-center gap-0.5 hover:text-foreground hover:underline">
+            Show context
+          </button>
+        </>
+      )}
     </div>
   );
 }

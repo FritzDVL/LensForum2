@@ -23,9 +23,10 @@ interface ThreadReplyCardProps {
   thread: Thread;
   community?: Community;
   onReplyClick?: () => void;
+  parentReplyId?: string;
 }
 
-export function ThreadReplyCard({ reply, thread, community, onReplyClick }: ThreadReplyCardProps) {
+export function ThreadReplyCard({ reply, community, onReplyClick, parentReplyId }: ThreadReplyCardProps) {
   const { content, image, video } = getReplyContent(reply.post);
 
   const [showPlusOne, setShowPlusOne] = useState(false);
@@ -84,7 +85,7 @@ export function ThreadReplyCard({ reply, thread, community, onReplyClick }: Thre
               {(() => {
                 const replyContext = getReplyContext(reply.post);
                 return replyContext?.replyToUsername ? (
-                  <InReplyToIndicator username={replyContext.replyToUsername} />
+                  <InReplyToIndicator username={replyContext.replyToUsername} postId={parentReplyId} />
                 ) : null;
               })()}
 

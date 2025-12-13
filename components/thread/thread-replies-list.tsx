@@ -8,6 +8,7 @@ import { useThreadReplies } from "@/hooks/queries/use-thread-replies";
 import { useReplyCreate } from "@/hooks/replies/use-reply-create";
 import { Community } from "@/lib/domain/communities/types";
 import { getReplyContent } from "@/lib/domain/replies/content";
+import { getReplyContext } from "@/lib/domain/replies/context";
 import { Reply } from "@/lib/domain/replies/types";
 import { Thread } from "@/lib/domain/threads/types";
 
@@ -73,15 +74,27 @@ export function ThreadRepliesList({ thread, community }: ThreadRepliesListProps)
     <>
       <div className="mt-6 space-y-4">
         <h3 className="text-xl font-bold text-foreground">{replies.length} Replies</h3>
-        {replies.map(reply => (
-          <ThreadReplyCard
-            key={reply.id}
-            reply={reply}
-            thread={thread}
-            community={community}
-            onReplyClick={() => handleReplyClick(reply)}
-          />
-        ))}
+        {replies.map((reply, index) => {
+          // Heuristic: Find the latest reply by the mentioned user that appeared BEFORE this reply
+          const replyContext = getReplyContext(reply.post);
+          const parentReply = replyContext?.replyToUsername
+            ? replies
+                .slice(0, index)
+                .reverse()
+                .find(prev => prev.post.author.username?.value === replyContext.replyToUsername)
+            : undefined;
+
+          return (
+            <ThreadReplyCard
+              key={reply.id}
+              reply={reply}
+              thread={thread}
+              community={community}
+              onReplyClick={() => handleReplyClick(reply)}
+              parentReplyId={parentReply?.id}
+            />
+          );
+        })}
       </div>
 
       {/* Composer at bottom */}
