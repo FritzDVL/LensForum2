@@ -18,6 +18,31 @@ This application allows users to create and participate in token-gated communiti
 - **Supabase Account** (Cloud recommended)
 - **Wallet** (Metamask, Rainbow, etc.) with a Private Key for admin operations.
 
+## Token Gating Capabilities
+
+This application leverages Lens Protocol's native token-gating features (via Lens Groups and Lit Protocol). This allows you to restrict access based on on-chain ownership.
+
+### **What's Possible?**
+
+1.  **Gated Membership (Join Rules):**
+    - **ERC-20 Tokens:** Require users to hold a specific amount of tokens (e.g., "Must hold 100 $BONSAI to join").
+    - **NFTs (ERC-721):** Require ownership of a specific NFT (e.g., "Must own a CryptoPunk").
+    - **Multi-Token (ERC-1155):** Support for semi-fungible tokens, often used for gaming items or membership passes.
+
+2.  **Granular Permissions:**
+    - You can set different rules for different actions.
+    - _Example:_ Anyone can **read**, but only Token Holders can **post** or **comment**.
+
+3.  **Complex Logic:**
+    - **AND Conditions:** Must hold Token A **AND** Token B.
+    - **OR Conditions:** Must hold Token A **OR** Token B.
+    - _Example:_ "Hold a Board Member NFT **OR** (Hold >1000 Governance Tokens **AND** 1 Reputation Badge)".
+
+4.  **Privacy (Encryption):**
+    - Content content can be encrypted so that only eligible holders can verify and decrypt it. Non-holders see nothing (or a locked message).
+
+These rules are enforced at the protocol level, making your community secure and truly decentralized.
+
 ## Setup Guide
 
 ### 1. Clone & Install

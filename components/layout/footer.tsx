@@ -6,12 +6,12 @@ export function Footer() {
       <span>
         Made with <span className="text-pink-500">&lt;3</span> by{" "}
         <a
-          href="https://hey.xyz/u/meketom"
+          href="https://hey.xyz/u/fritzdvl"
           target="_blank"
           rel="noopener noreferrer"
           className="font-semibold text-brand-700 hover:underline dark:text-brand-400"
         >
-          @meketom
+          @fritzdvl
         </a>
       </span>
       <div className="flex gap-4">
@@ -27,7 +27,7 @@ export function Footer() {
           </svg>
         </a>
         <a
-          href="https://hey.xyz/u/meketom"
+          href="https://hey.xyz/u/fritzdvl"
           target="_blank"
           rel="noopener noreferrer"
           aria-label="Hey Profile"

@@ -88,14 +88,16 @@ export function CommunityRulesManager({ community }: CommunityRulesManagerProps)
                       symbolElement && symbolElement.__typename === "StringKeyValue" ? symbolElement.string : "";
 
                     const standardElement = currentRule.config.find(e => e.key === "assetStandard");
+                    const standardRaw =
+                      standardElement && standardElement.__typename === "IntKeyValue" ? standardElement.int : null;
                     const standard =
-                      standardElement && standardElement.__typename === "IntKeyValue"
-                        ? standardElement.int === 20
-                          ? "ERC20"
-                          : standardElement.int === 721
-                            ? "ERC721"
-                            : standardElement.int
-                        : "";
+                      standardRaw === 20
+                        ? "ERC20"
+                        : standardRaw === 721
+                          ? "ERC721"
+                          : standardRaw === 1155
+                            ? "ERC1155"
+                            : standardRaw;
 
                     const amountElement = currentRule.config.find(e => e.key === "amount");
                     const amount =
@@ -103,12 +105,22 @@ export function CommunityRulesManager({ community }: CommunityRulesManagerProps)
                         ? amountElement.bigDecimal
                         : "";
 
+                    const tokenIdElement = currentRule.config.find(e => e.key === "tokenId");
+                    const tokenId =
+                      tokenIdElement && tokenIdElement.__typename === "StringKeyValue" ? tokenIdElement.string : "";
+
                     return (
                       <>
                         <div className="flex justify-between">
                           <span className="text-muted-foreground">Token Contract:</span>
                           <span className="font-mono text-xs">{contract}</span>
                         </div>
+                        {standard === "ERC1155" && tokenId && (
+                          <div className="flex justify-between">
+                            <span className="text-muted-foreground">Token ID:</span>
+                            <span className="font-medium">{tokenId}</span>
+                          </div>
+                        )}
                         <div className="flex justify-between">
                           <span className="text-muted-foreground">Name:</span>
                           <span className="font-medium">{name}</span>

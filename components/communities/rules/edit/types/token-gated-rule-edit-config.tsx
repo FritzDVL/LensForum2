@@ -21,6 +21,7 @@ interface TokenGatedRuleEditConfigProps {
 export function TokenGatedRuleEditConfig({ community, currentRule }: TokenGatedRuleEditConfigProps) {
   const [tokenAddress, setTokenAddress] = useState<Address>("0x0");
   const [tokenValue, setTokenValue] = useState<string>("1");
+  const [tokenId, setTokenId] = useState<string>("");
   const [tokenStandard, setTokenStandard] = useState<TokenStandard>(TokenStandard.Erc721);
   const [touched, setTouched] = useState(false);
 
@@ -29,19 +30,30 @@ export function TokenGatedRuleEditConfig({ community, currentRule }: TokenGatedR
   const validAddress = isValidAddress(tokenAddress);
   const valueNum = Number(tokenValue);
   const validValue = !isNaN(valueNum) && valueNum > 0;
-  const canSubmit = validAddress && validValue && !loading;
+
+  // Validation for Token ID if ERC1155 is selected
+  const validTokenId = tokenStandard === TokenStandard.Erc1155 ? tokenId.trim().length > 0 : true;
+
+  const canSubmit = validAddress && validValue && validTokenId && !loading;
 
   const handleUpdate = () => {
     setTouched(true);
     if (!canSubmit) return;
+
+    const tokenData: any = {
+      currency: tokenAddress as Address,
+      standard: tokenStandard,
+      value: bigDecimal(tokenValue),
+    };
+
+    if (tokenStandard === TokenStandard.Erc1155) {
+      tokenData.tokenId = tokenId;
+    }
+
     const newRule: TokenGatedGroupRule = {
       type: "TokenGatedGroupRule",
       tokenGatedRule: {
-        token: {
-          currency: tokenAddress as Address,
-          standard: tokenStandard,
-          value: bigDecimal(tokenValue),
-        },
+        token: tokenData,
       },
     };
     updateRules(newRule as any);
@@ -60,6 +72,7 @@ export function TokenGatedRuleEditConfig({ community, currentRule }: TokenGatedR
             <SelectContent>
               <SelectItem value={TokenStandard.Erc20}>ERC20 (Token)</SelectItem>
               <SelectItem value={TokenStandard.Erc721}>ERC721 (NFT)</SelectItem>
+              <SelectItem value={TokenStandard.Erc1155}>ERC1155 (Multi-Token)</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -74,6 +87,23 @@ export function TokenGatedRuleEditConfig({ community, currentRule }: TokenGatedR
           />
           {!validAddress && touched && <div className="mt-1 text-xs text-red-500">Enter a valid Ethereum address</div>}
         </div>
+
+        {tokenStandard === TokenStandard.Erc1155 && (
+          <div className="space-y-2">
+            <label className="mb-1 block text-sm font-medium text-foreground">Token ID</label>
+            <Input
+              type="text"
+              placeholder="e.g. 1"
+              value={tokenId}
+              onChange={e => setTokenId(e.target.value)}
+              onBlur={() => setTouched(true)}
+            />
+            {!validTokenId && touched && (
+              <div className="mt-1 text-xs text-red-500">Token ID is required for ERC1155</div>
+            )}
+          </div>
+        )}
+
         <div className="space-y-2">
           <label className="mb-1 block text-sm font-medium text-foreground">
             {`Minimum Balance (${tokenStandard === TokenStandard.Erc721 ? "NFTs" : "Tokens"})`}

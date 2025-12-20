@@ -1,3 +1,4 @@
+import { ThreadClassification } from "@/lib/domain/classification/types";
 import { Address } from "@/types/common";
 import { Account, Post } from "@lens-protocol/client";
 
@@ -14,6 +15,7 @@ export interface Thread {
   created_at: string;
   updatedAt: string;
   app?: string;
+  classification?: ThreadClassification;
 }
 
 export interface CreateThreadFormData {

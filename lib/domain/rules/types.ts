@@ -21,6 +21,7 @@ export interface TokenGatedGroupRule {
       currency: Address;
       standard: TokenStandard;
       value: string;
+      tokenId?: string;
     };
   };
 }

@@ -43,7 +43,8 @@ export function CommunityThreadsList({ threads }: { threads: Thread[] }) {
 
         {/* Table Headers */}
         <div className="hidden grid-cols-12 gap-4 px-2 pb-3 text-xs font-medium uppercase tracking-wider text-muted-foreground sm:grid">
-          <div className="col-span-7 pl-2">Topic</div>
+          <div className="col-span-6 pl-2">Topic</div>
+          <div className="col-span-1 text-center">Posters</div>
           <div className="col-span-2 text-center">Replies</div>
           <div className="col-span-1 text-center">Views</div>
           <div className="col-span-2 pr-2 text-right">Activity</div>

@@ -79,13 +79,12 @@ export function CommunitySettingsClient({ community }: CommunitySettingsClientPr
             Members
           </button>
           <button
-            disabled
             onClick={() => setActiveTab("rules")}
             className={`rounded-lg px-3 py-2 text-xs font-medium transition-all sm:rounded-xl sm:px-6 sm:py-3 sm:text-sm ${
               activeTab === "rules"
                 ? "bg-primary text-foreground shadow-sm"
                 : "text-muted-foreground hover:text-foreground"
-            } disabled:cursor-not-allowed disabled:opacity-60`}
+            }`}
           >
             <BookOpen className="mr-2 inline h-4 w-4" />
             Rules

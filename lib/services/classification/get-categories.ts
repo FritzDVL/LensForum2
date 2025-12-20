@@ -6,7 +6,7 @@ export async function getCategories(channelAddress: string): Promise<Category[]>
   const { data, error } = await supabase
     .from("categories")
     .select("*")
-    .eq("channel_address", channelAddress)
+    .ilike("channel_address", channelAddress)
     .order("name");
 
   if (error) {

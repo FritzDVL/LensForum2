@@ -1,4 +1,4 @@
-import { adaptExternalFeedToThread, adaptFeedToThread } from "@/lib/adapters/thread-adapter";
+import { adaptDbThreadToThread, adaptExternalFeedToThread, adaptFeedToThread } from "@/lib/adapters/thread-adapter";
 import { Community } from "@/lib/domain/communities/types";
 import { Thread } from "@/lib/domain/threads/types";
 import { fetchPostsBatch, fetchPostsByFeed } from "@/lib/external/lens/primitives/posts";
@@ -75,8 +75,18 @@ export async function getCommunityThreads(
       });
       const threadPromises = dbThreads.map(async threadRecord => {
         const rootPost = threadRecord.root_post_id ? rootPostMap.get(threadRecord.root_post_id) : null;
-        if (!rootPost || !rootPost.author) return null;
-        return await adaptFeedToThread(rootPost.author, threadRecord, rootPost);
+
+        // If we found a valid Lens post with author, use the full adapter
+        if (rootPost && rootPost.author) {
+          return await adaptFeedToThread(rootPost.author, threadRecord, rootPost);
+        }
+
+        // Fallback: If Lens post is missing (deleted, or network error, or invalid ID),
+        // render the thread using only Database data so it's not lost to the UI.
+        console.warn(
+          `Thread ${threadRecord.id} (Root: ${threadRecord.root_post_id}) missing in Lens, using DB fallback`,
+        );
+        return adaptDbThreadToThread(threadRecord);
       });
       const threads = (await Promise.all(threadPromises)).filter(Boolean) as Thread[];
       return { success: true, threads };
