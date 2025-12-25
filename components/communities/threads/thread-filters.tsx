@@ -44,12 +44,17 @@ export function ThreadFilters({ categories, tags }: ThreadFiltersProps) {
   return (
     <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
       {/* Navigation Tabs */}
-      <div className="flex items-center space-x-1 rounded-lg bg-slate-100 p-1 dark:bg-gray-800">
+      {/* Navigation Tabs - Discourse Style */}
+      <div className="flex items-center gap-1">
         <Button
           variant={!currentCategorySlug && !currentTagSlug ? "secondary" : "ghost"}
           size="sm"
           onClick={() => router.push("?")}
-          className={`rounded-md px-3 text-sm font-medium ${!currentCategorySlug && !currentTagSlug ? "shadow-sm" : "text-muted-foreground hover:text-foreground"}`}
+          className={`h-9 px-4 text-sm font-medium ${
+            !currentCategorySlug && !currentTagSlug
+              ? "bg-brand-100 text-brand-900 hover:bg-brand-200 dark:bg-brand-900/30 dark:text-brand-100 dark:hover:bg-brand-900/50"
+              : "text-muted-foreground hover:bg-slate-100 hover:text-foreground dark:hover:bg-gray-800"
+          }`}
         >
           Latest
         </Button>
@@ -57,13 +62,26 @@ export function ThreadFilters({ categories, tags }: ThreadFiltersProps) {
           variant="ghost"
           size="sm"
           onClick={() => {
-            // Get the current path (e.g., /communities/0x123) and append /categories
             const path = window.location.pathname;
             router.push(`${path}/categories`);
           }}
-          className="rounded-md px-3 text-sm font-medium text-muted-foreground hover:text-foreground"
+          className="h-9 px-4 text-sm font-medium text-muted-foreground hover:bg-slate-100 hover:text-foreground dark:hover:bg-gray-800"
         >
           Categories
+        </Button>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="h-9 px-4 text-sm font-medium text-muted-foreground hover:bg-slate-100 hover:text-foreground dark:hover:bg-gray-800"
+        >
+          Top
+        </Button>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="h-9 px-4 text-sm font-medium text-muted-foreground hover:bg-slate-100 hover:text-foreground dark:hover:bg-gray-800"
+        >
+          Bookmarks
         </Button>
       </div>
 

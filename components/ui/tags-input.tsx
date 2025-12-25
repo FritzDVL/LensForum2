@@ -28,7 +28,7 @@ export function TagsInput({
   return (
     <div className="space-y-2">
       {/* Compact input matching the rest of the form */}
-      <div className="flex h-12 items-center gap-2 overflow-hidden rounded-2xl border border-brand-200/40 bg-gray-50/80 px-4 backdrop-blur-sm focus-within:ring-2 focus-within:ring-brand-200/40 dark:border-gray-700/60 dark:bg-slate-800/90">
+      <div className="flex h-12 items-center gap-2 overflow-hidden rounded-md border border-brand-200/40 bg-gray-50/80 px-4 backdrop-blur-sm focus-within:ring-2 focus-within:ring-brand-200/40 dark:border-gray-700/60 dark:bg-slate-800/90">
         <Hash className="h-4 w-4 text-muted-foreground" />
         <Input
           value={tagInput}

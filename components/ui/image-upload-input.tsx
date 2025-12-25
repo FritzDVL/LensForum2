@@ -59,14 +59,14 @@ export function ImageUploadInput({
         </label>
       )}
       <div className="flex items-center space-x-4">
-        <div className="flex h-20 w-20 items-center justify-center rounded-2xl border-2 border-dashed border-gray-300 bg-gray-50 dark:border-gray-600 dark:bg-gray-800">
+        <div className="flex h-20 w-20 items-center justify-center rounded-md border-2 border-dashed border-gray-300 bg-gray-50 dark:border-gray-600 dark:bg-gray-800">
           {previewUrl ? (
             <Image
               src={previewUrl}
               alt="Preview"
               width={80}
               height={80}
-              className="h-full w-full rounded-2xl object-cover"
+              className="h-full w-full rounded-md object-cover"
             />
           ) : currentImageUrl ? (
             <Image
@@ -74,10 +74,10 @@ export function ImageUploadInput({
               alt={currentImageAlt || "Current image"}
               width={80}
               height={80}
-              className="h-full w-full rounded-2xl object-cover"
+              className="h-full w-full rounded-md object-cover"
             />
           ) : (
-            <div className="flex h-full w-full items-center justify-center rounded-2xl bg-gradient-to-br from-brand-500 to-brand-600 text-2xl text-white">
+            <div className="flex h-full w-full items-center justify-center rounded-md bg-gradient-to-br from-brand-500 to-brand-600 text-2xl text-white">
               <Upload className="h-8 w-8 opacity-60" />
             </div>
           )}

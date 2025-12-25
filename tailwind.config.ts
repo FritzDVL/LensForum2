@@ -52,17 +52,17 @@ const config: Config = {
         ring: "hsl(var(--ring))",
         // Brand colors (Discourse-like Blue)
         brand: {
-          50: "#f4f7f6", // lightly tinted off-white
-          100: "#e3e9e7", // very pale grey-green
-          200: "#c6d5d1", // pale grey-green
-          300: "#9ebcb5", // light muted green
-          400: "#749e95", // muted green
-          500: "#538076", // mid-tone grey-green
-          600: "#3e635b", // deep grey-green
-          700: "#334f49", // dark slate green
-          800: "#2a3f3a", // darker slate
-          900: "#243430", // very dark slate
-          950: "#06211A", // User requested hex
+          50: "#f0f9ff",
+          100: "#e0f2fe",
+          200: "#bae6fd",
+          300: "#7dd3fc",
+          400: "#38bdf8",
+          500: "#0ea5e9", // Primary Discourse/Sky Blue
+          600: "#0284c7",
+          700: "#0369a1",
+          800: "#075985",
+          900: "#0c4a6e",
+          950: "#082f49",
         },
       },
       borderRadius: {
